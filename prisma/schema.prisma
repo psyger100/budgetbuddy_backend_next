@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  userName     String         @unique
+  email        String         @unique
+  password     String
+  refreshToken String?
+  Transaction  Transaction[]  @relation("transactionOwner")
+  UserOnGroups UserOnGroups[] @relation("member")
+  Friend1      Friend[]       @relation("FriendRequestSender")
+  Friend2      Friend[]       @relation("FriendRequestReceiver")
+}
+
+model Friend {
+  id         String  @id @default(auto()) @map("_id") @db.ObjectId
+  userId     String  @db.ObjectId
+  user       User    @relation("FriendRequestSender", fields: [userId], references: [id])
+  friendId   String  @db.ObjectId
+  friend     User    @relation("FriendRequestReceiver", fields: [friendId], references: [id])
+  isAccepted Boolean
+}
+
+model Group {
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  name         String
+  UserOnGroups UserOnGroups[] @relation("groupMember")
+  Category     Category[]     @relation("groupCategory")
+  Transaction  Transaction[]  @relation("groupTransaction")
+}
+
+model UserOnGroups {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  groupId    String @db.ObjectId
+  group      Group  @relation("groupMember", fields: [groupId], references: [id])
+  userId     String @db.ObjectId
+  user       User   @relation("member", fields: [userId], references: [id])
+  maxAmount  Int
+  restAmount Int
+}
+
+model Category {
+  id          String        @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  maxAmount   Int
+  restAmount  Int
+  Transaction Transaction[] @relation("categoryRef")
+  groupId     String        @db.ObjectId
+  group       Group         @relation("groupCategory", fields: [groupId], references: [id])
+}
+
+model Transaction {
+  id               String    @id @default(auto()) @map("_id") @db.ObjectId
+  description      String
+  amount           Int
+  date             DateTime? @default(now())
+  transactionOwner String    @db.ObjectId
+  user             User      @relation("transactionOwner", fields: [transactionOwner], references: [id])
+  category         Category  @relation("categoryRef", fields: [categoryId], references: [id])
+  categoryId       String    @db.ObjectId
+  groupId          String    @db.ObjectId
+  group            Group     @relation("groupTransaction", fields: [groupId], references: [id])
+}
+
