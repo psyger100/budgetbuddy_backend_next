@@ -5,6 +5,7 @@ import * as argon2 from "argon2";
 export async function POST(request: NextRequest) {
     const body = await request.json();
     const newUserData = body.signUp;
+    const a = request;
 
     try {
         const isUniqueEmail = await userTable.findUnique({
