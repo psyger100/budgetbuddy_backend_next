@@ -1,11 +1,10 @@
 import { userTable } from "@/utils/prisma";
-import { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import * as argon2 from "argon2";
 
-export async function POST(request: NextRequest) {
+export async function POST(request: NextRequest, response: NextResponse) {
     const body = await request.json();
     const newUserData = body.signUp;
-    const a = request;
 
     try {
         const isUniqueEmail = await userTable.findUnique({
