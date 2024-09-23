@@ -42,8 +42,7 @@ export async function POST(request: NextRequest) {
                 return Response.json({ message: "UserName not available." });
             }
         }
-    } catch (error: any) {
-        console.log("error= ", error.message);
+    } catch (error) {
         return Response.json({ message: "User Creation Failed" });
     }
 }

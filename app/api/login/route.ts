@@ -36,9 +36,7 @@ export async function POST(request: Request) {
             setAccessToken: accessToken,
             setRefreshToken: refreshToken,
         });
-    } catch (error: any) {
-        console.log("I am the error :- > ", error.message, "\n\n\n");
-
+    } catch (error) {
         return Response.json({ message: "Login Failed" });
     }
 }
