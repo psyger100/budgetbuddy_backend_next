@@ -22,8 +22,14 @@ export async function middleware(request: NextRequest, response: NextResponse) {
                     },
                 });
                 if (refreshToken === accessTokenDbVerification?.refreshToken) {
-                    delete (decoded_value as { iat?: number })?.iat;
-                    delete (decoded_value as { exp?: number })?.exp;
+                    delete (decoded_value.payload as { iat?: number })?.iat;
+                    delete (decoded_value.payload as { exp?: number })?.exp;
+                    delete (decoded_value.payload as { password?: string })?.password;
+                    delete (decoded_value as { protectedHeader?: object })
+                        ?.protectedHeader;
+                    delete (decoded_value.payload as { refreshToken?: string })
+                        ?.refreshToken;
+
                     request.headers.set("current_user", JSON.stringify(decoded_value));
                     return NextResponse.next({
                         request: request,
@@ -47,8 +53,13 @@ export async function middleware(request: NextRequest, response: NextResponse) {
                     });
 
                     request.headers.set("setAccessToken", accessToken.toString());
-                    delete (decoded_value as { iat?: number })?.iat;
-                    delete (decoded_value as { exp?: number })?.exp;
+                    delete (decoded_value.payload as { iat?: number })?.iat;
+                    delete (decoded_value.payload as { exp?: number })?.exp;
+                    delete (decoded_value.payload as { password?: string })?.password;
+                    delete (decoded_value as { protectedHeader?: object })
+                        ?.protectedHeader;
+                    delete (decoded_value.payload as { refreshToken?: string })
+                        ?.refreshToken;
                     request.headers.set("current_user", JSON.stringify(decoded_value));
                     return NextResponse.next({
                         request: request,

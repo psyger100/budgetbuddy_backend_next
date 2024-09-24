@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
     let current_user: CurrentUserType;
     try {
         current_user = JSON.parse(currentUserHeader) as CurrentUserType;
+        console.log(current_user);
     } catch (error) {
         return Response.json({ message: "Invalid user data" }, { status: 400 });
     }
