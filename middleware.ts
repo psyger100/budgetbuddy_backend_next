@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { userTable } from "./utils/prisma";
-import { generateAccessToken } from "./utils/Tokens";
-import jwt from "jsonwebtoken";
+// import { generateAccessToken } from "./utils/Tokens";
+
 import * as jose from "jose";
 export async function middleware(request: NextRequest, response: NextResponse) {
     const accessToken = request.headers.get("accessToken");
