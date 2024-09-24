@@ -11,8 +11,6 @@ export async function POST(request: Request) {
                 email: email,
             },
         });
-        console.log(user);
-
         if (!user) {
             return Response.json({ message: "User not found" }, { status: 404 });
         }
