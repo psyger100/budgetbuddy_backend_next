@@ -35,6 +35,6 @@ export async function POST(request: Request) {
             setRefreshToken: refreshToken,
         });
     } catch (error) {
-        return Response.json({ message: "Login Failed" });
+        return Response.json({ message: "Login Failed" }, { status: 401 });
     }
 }
