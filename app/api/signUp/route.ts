@@ -30,7 +30,7 @@ export async function POST(request: NextRequest, response: NextResponse) {
                     },
                 });
                 if (response) {
-                    return Response.json({ message: "User Created" });
+                    return Response.json({ message: "Friend Added" });
                 }
             }
         } else {

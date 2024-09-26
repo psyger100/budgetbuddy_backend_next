@@ -74,9 +74,15 @@ export async function middleware(request: NextRequest, response: NextResponse) {
 export const config = {
     matcher: [
         "/api/sayHello",
+        "/api/setTransaction",
+        "/api/setCategory",
+        "/api/getCategory",
+        "/api/getTransaction",
+        "/api/getUser",
         "/api/getGroups",
         "/api/logout",
         "/api/getFriends",
         "/api/createGroup",
+        "/api/addFriend",
     ],
 };

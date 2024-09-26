@@ -16,8 +16,6 @@ export async function POST(request: Request) {
 
         const current_user = request.headers.get("current_user");
 
-        console.log("\n\n\n\n", current_user, "\n\n\n\n");
-
         const current_user_id = JSON.parse(current_user as string).payload.id;
         const groupCreation = await groupTable.create({
             data: {
@@ -25,8 +23,6 @@ export async function POST(request: Request) {
             },
         });
         if (groupCreation) {
-            console.log(groupCreation);
-
             const users = info.createGroup.members.map(
                 (item: {
                     id: String;
@@ -61,9 +57,6 @@ export async function POST(request: Request) {
         }
         return Response.json({ message: "Error creating group" }, { status: 500 });
     } catch (error) {
-        // @ts-ignore
-        console.log(error.message);
-
         return Response.json({ message: "Error creating group" }, { status: 500 });
     }
 }
