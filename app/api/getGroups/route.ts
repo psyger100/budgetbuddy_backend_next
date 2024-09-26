@@ -11,7 +11,6 @@ export async function GET(request: NextRequest) {
     let current_user: CurrentUserType;
     try {
         current_user = JSON.parse(currentUserHeader) as CurrentUserType;
-        console.log(current_user);
     } catch (error) {
         return Response.json({ message: "Invalid user data" }, { status: 400 });
     }
@@ -29,7 +28,6 @@ export async function GET(request: NextRequest) {
         },
     });
     if (data) {
-        console.log(data);
         return Response.json(data, { status: 200 });
     }
     return Response.json({ message: "No Gruops found " }, { status: 404 });
