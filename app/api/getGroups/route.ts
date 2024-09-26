@@ -28,7 +28,10 @@ export async function GET(request: NextRequest) {
         },
     });
     if (data) {
-        return Response.json(data, { status: 200 });
+        if (data.length != 0) {
+            return Response.json(data, { status: 200 });
+        }
+        return Response.json({ message: "You are not in any group." }, { status: 200 });
     }
     return Response.json({ message: "No Gruops found " }, { status: 404 });
 }
