@@ -45,9 +45,9 @@ model Group {
 
 model UserOnGroups {
   id         String @id @default(auto()) @map("_id") @db.ObjectId
-  groupId    String @db.ObjectId
+  groupId    String @db.ObjectId @unique
   group      Group  @relation("groupMember", fields: [groupId], references: [id])
-  userId     String @db.ObjectId
+  userId     String @db.ObjectId @unique
   user       User   @relation("member", fields: [userId], references: [id])
   maxAmount  Int
   restAmount Int

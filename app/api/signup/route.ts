@@ -20,7 +20,6 @@ export async function POST(request: NextRequest, response: NextResponse) {
 
         if (!isUniqueEmail && !isUniqueUserName) {
             const newpassword = await argon2.hash(newUserData.password);
-            //   const newpassword = await bcrypt.hash(newUserData.password, 10);
             if (newpassword) {
                 const response = await userTable.create({
                     data: {
