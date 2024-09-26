@@ -72,5 +72,11 @@ export async function middleware(request: NextRequest, response: NextResponse) {
     }
 }
 export const config = {
-    matcher: ["/api/sayHello", "/api/getGroups", "/api/logout"],
+    matcher: [
+        "/api/sayHello",
+        "/api/getGroups",
+        "/api/logout",
+        "/api/getFriends",
+        "/api/createGroup",
+    ],
 };
