@@ -35,6 +35,8 @@ export async function POST(request: Request) {
             setRefreshToken: refreshToken,
         });
     } catch (error) {
+        // @ts-ignore
+        console.log(error.message);
         return Response.json({ message: "Login Failed" }, { status: 401 });
     }
 }
