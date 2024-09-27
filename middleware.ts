@@ -64,6 +64,11 @@ export async function middleware(request: NextRequest, response: NextResponse) {
                     return NextResponse.next({
                         request: request,
                     });
+                } else {
+                    return NextResponse.json(
+                        { message: "Login Required" },
+                        { status: 401 },
+                    );
                 }
             }
         } catch (error) {
