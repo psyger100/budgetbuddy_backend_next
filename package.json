@@ -10,7 +10,7 @@
     },
     "dependencies": {
         "@prisma/extension-accelerate": "^1.1.0",
-        "argon2": "^0.41.1",
+        "argon2": "0.31.2",
         "jose": "^5.9.3",
         "next": "14.2.13",
         "prisma": "^5.19.1",
