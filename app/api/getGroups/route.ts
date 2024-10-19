@@ -33,8 +33,8 @@ export async function GET(request: NextRequest) {
                 { status: 200 },
             );
         }
-    } catch (error) {
-        return Response.json({ message: "Internal Server Error" }, { status: 500 });
+    } catch (error: any) {
+        return Response.json({ message: error.message }, { status: 500 });
     }
 
     // return Response.json({ message: "No Groups found " }, { status: 404 });
