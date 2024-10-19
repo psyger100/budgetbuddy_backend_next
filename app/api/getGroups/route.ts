@@ -11,27 +11,31 @@ export async function GET(request: NextRequest) {
     let current_user: CurrentUserType;
     try {
         current_user = JSON.parse(currentUserHeader) as CurrentUserType;
-    } catch (error) {
-        return Response.json({ message: "Invalid user data" }, { status: 400 });
-    }
-    const data = await userOnGroupsTable.findMany({
-        where: {
-            userId: current_user.payload.id.toString(),
-        },
-        select: {
-            group: {
-                select: {
-                    id: true,
-                    name: true,
+        const data = await userOnGroupsTable.findMany({
+            where: {
+                userId: current_user.payload.id.toString(),
+            },
+            select: {
+                group: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
                 },
             },
-        },
-    });
-    if (data) {
-        if (data.length != 0) {
-            return Response.json(data, { status: 200 });
+        });
+        if (data) {
+            if (data.length != 0) {
+                return Response.json(data, { status: 200 });
+            }
+            return Response.json(
+                { message: "You are not in any group." },
+                { status: 200 },
+            );
         }
-        return Response.json({ message: "You are not in any group." }, { status: 200 });
+    } catch (error) {
+        return Response.json({ message: "Internal Server Error" }, { status: 500 });
     }
-    return Response.json({ message: "No Gruops found " }, { status: 404 });
+
+    // return Response.json({ message: "No Groups found " }, { status: 404 });
 }
