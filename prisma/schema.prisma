@@ -14,12 +14,13 @@ datasource db {
 }
 
 model User {
-  id           String         @id  @default(auto()) @map("_id") @db.ObjectId
+  id           String         @id @default(auto()) @map("_id") @db.ObjectId
   name         String
   userName     String         @unique
   email        String         @unique
   password     String
   refreshToken String?
+  avatar_url   String?
   Transaction  Transaction[]  @relation("transactionOwner")
   UserOnGroups UserOnGroups[] @relation("member")
   Friend1      Friend[]       @relation("FriendRequestSender")
@@ -45,9 +46,9 @@ model Group {
 
 model UserOnGroups {
   id         String @id @default(auto()) @map("_id") @db.ObjectId
-  groupId    String @db.ObjectId @unique
+  groupId    String @db.ObjectId
   group      Group  @relation("groupMember", fields: [groupId], references: [id])
-  userId     String @db.ObjectId @unique
+  userId     String @db.ObjectId
   user       User   @relation("member", fields: [userId], references: [id])
   maxAmount  Int
   restAmount Int
@@ -75,4 +76,3 @@ model Transaction {
   groupId          String    @db.ObjectId
   group            Group     @relation("groupTransaction", fields: [groupId], references: [id])
 }
-
