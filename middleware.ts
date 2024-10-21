@@ -89,5 +89,6 @@ export const config = {
         "/api/getFriends",
         "/api/createGroup",
         "/api/addFriend",
+        "/api/whoAmI",
     ],
 };
