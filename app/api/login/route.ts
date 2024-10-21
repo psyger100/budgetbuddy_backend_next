@@ -18,7 +18,7 @@ export async function POST(request: Request) {
         if (!passwordMatch) {
             return Response.json({ message: "Invalid password" }, { status: 401 });
         }
-
+        delete (user as { refreshToken?: string })?.refreshToken;
         const accessToken = await generateAccessToken(user);
         const refreshToken = await generateRefreshToken(user);
         await userTable.update({
