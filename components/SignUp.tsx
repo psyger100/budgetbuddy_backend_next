@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
 import { useRouter } from "next/navigation";
+import axios from "axios";
 
 export default function SignUp() {
     const router = useRouter();
@@ -26,7 +26,6 @@ export default function SignUp() {
         setSuccess("");
         setIsLoading(true);
 
-        // Simple validation
         if (
             !formData.name ||
             !formData.userName ||
@@ -48,12 +47,21 @@ export default function SignUp() {
             const response = await axios.post("/api/signUp", { signUp: formData });
             if (response.data.message === "Friend Added") {
                 setSuccess("Signup successful! Redirecting to login...");
+                if (response.data.user) {
+                    localStorage.setItem("user", JSON.stringify(response.data.user));
+                }
                 setTimeout(() => router.push("/login"), 2000);
             } else {
-                setError(response.data.message);
+                throw new Error(response.data.message || "Signup failed");
             }
         } catch (error) {
-            setError("An error occurred. Please try again.");
+            console.error("Signup error:", error);
+            setError(
+                axios.isAxiosError(error)
+                    ? error.response?.data?.message || "An error occurred during signup"
+                    : "Something went wrong. Please try again.",
+            );
+            localStorage.removeItem("user");
         } finally {
             setIsLoading(false);
         }

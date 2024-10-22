@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
+import * as jose from "jose";
 
 export default function SignIn() {
     const [email, setEmail] = useState("");
@@ -22,20 +23,49 @@ export default function SignIn() {
                 const accessToken = localStorage.getItem("accessToken");
                 const refreshToken = localStorage.getItem("refreshToken");
                 if (accessToken && refreshToken) {
-                    const response = await api.get("/login", {
-                        headers: { Authorization: `Bearer ${refreshToken}` },
-                    });
-                    if (response.data.isValid) {
+                    const isValid = await verifyToken(accessToken);
+                    if (isValid) {
                         router.push("/");
+                    } else {
+                        // Try to refresh the token
+                        const newAccessToken = await refreshAccessToken(refreshToken);
+                        if (newAccessToken) {
+                            localStorage.setItem("accessToken", newAccessToken);
+                            router.push("/");
+                        } else {
+                            throw new Error("Invalid refresh token");
+                        }
                     }
                 }
             } catch (error) {
+                console.error("Auth check error:", error);
                 localStorage.removeItem("accessToken");
                 localStorage.removeItem("refreshToken");
             }
         };
         checkAuth();
     }, [router]);
+
+    const verifyToken = async (token: string) => {
+        try {
+            const secret = new TextEncoder().encode(process.env.NEXT_PUBLIC_JWT_SECRET);
+            await jose.jwtVerify(token, secret);
+            return true;
+        } catch (error) {
+            console.error("Token verification error:", error);
+            return false;
+        }
+    };
+
+    const refreshAccessToken = async (refreshToken: string) => {
+        try {
+            const response = await api.post("/refresh", { refreshToken });
+            return response.data.accessToken;
+        } catch (error) {
+            console.error("Token refresh error:", error);
+            return null;
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -52,6 +82,7 @@ export default function SignIn() {
             localStorage.setItem("refreshToken", refreshToken);
             router.push("/");
         } catch (error) {
+            console.error("Login error:", error);
             setError(
                 axios.isAxiosError(error)
                     ? error.response?.data?.message || "Invalid credentials"
