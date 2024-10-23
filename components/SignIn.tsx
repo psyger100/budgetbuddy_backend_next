@@ -21,20 +21,12 @@ export default function SignIn() {
         const checkAuth = async () => {
             try {
                 const accessToken = localStorage.getItem("accessToken");
-                const refreshToken = localStorage.getItem("refreshToken");
-                if (accessToken && refreshToken) {
+                if (accessToken) {
                     const isValid = await verifyToken(accessToken);
                     if (isValid) {
                         router.push("/");
                     } else {
-                        // Try to refresh the token
-                        const newAccessToken = await refreshAccessToken(refreshToken);
-                        if (newAccessToken) {
-                            localStorage.setItem("accessToken", newAccessToken);
-                            router.push("/");
-                        } else {
-                            throw new Error("Invalid refresh token");
-                        }
+                        throw new Error("Invalid access token");
                     }
                 }
             } catch (error) {
@@ -57,6 +49,7 @@ export default function SignIn() {
         }
     };
 
+    // Remove or comment out this function
     // const refreshAccessToken = async (refreshToken: string) => {
     //     try {
     //         const response = await api.post("/refresh", { refreshToken });
@@ -77,9 +70,14 @@ export default function SignIn() {
         setIsLoading(true);
         try {
             const response = await api.post("/login", { email, password });
-            const { accessToken, refreshToken } = response.data;
-            localStorage.setItem("accessToken", accessToken);
-            localStorage.setItem("refreshToken", refreshToken);
+            console.log("Login response:", response.data);
+            const { setAccessToken, setRefreshToken } = response.data;
+            if (setAccessToken && setRefreshToken) {
+                localStorage.setItem("accessToken", setAccessToken);
+                localStorage.setItem("refreshToken", setRefreshToken);
+            } else {
+                throw new Error("Invalid response: Missing tokens");
+            }
             router.push("/");
         } catch (error) {
             console.error("Login error:", error);

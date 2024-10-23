@@ -1,30 +1,38 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import axios from "axios";
-import { UserCircle } from "lucide-react";
+import { useEffect, useState } from "react";
 
-interface UserInformation {
+interface UserInfo {
     id: string;
     userName: string;
     name: string;
     email: string;
-    avatar_url: string | null;
+    avatar_url: string;
 }
 
 export default function UserInfo() {
-    const [user, setUser] = useState<UserInformation | null>(null);
+    const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
-                const response = await axios.get("/api/whoAmI");
-                setUser(response.data.userInformation);
+                const response = await fetch("/api/whoAmI", {
+                    headers: {
+                        // accessToken: localStorage.getItem("accessToken") || "",
+                        refreshToken: localStorage.getItem("refreshToken") || "",
+                    },
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to fetch user information");
+                }
+
+                const data = await response.json();
+                setUserInfo(data.userInformation);
             } catch (err) {
-                setError("Failed to fetch user information. Please try again later.");
-                console.log(error);
+                setError(err instanceof Error ? err.message : "An error occurred");
             } finally {
                 setLoading(false);
             }
@@ -35,84 +43,57 @@ export default function UserInfo() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-gray-900"></div>
+            <div className="w-full max-w-md mx-auto bg-white shadow-md rounded-lg p-6">
+                <h2 className="text-2xl font-bold mb-4">User Information</h2>
+                <div className="space-y-4">
+                    <div className="h-12 w-12 rounded-full bg-gray-200 animate-pulse"></div>
+                    <div className="h-4 w-full bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-4 w-full bg-gray-200 rounded animate-pulse"></div>
+                    <div className="h-4 w-full bg-gray-200 rounded animate-pulse"></div>
+                </div>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="min-h-screen flex items-center justify-center">
-                <div
-                    className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-                    role="alert"
-                >
-                    <strong className="font-bold">Error!</strong>
-                    <span className="block sm:inline"> {error}</span>
-                </div>
+            <div className="w-full max-w-md mx-auto bg-white shadow-md rounded-lg p-6">
+                <h2 className="text-2xl font-bold mb-4">Error</h2>
+                <p className="text-red-500">{error}</p>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-                <div className="px-4 py-5 sm:px-6">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900">
-                        User Profile
-                    </h3>
-                    <p className="mt-1 max-w-2xl text-sm text-gray-500">
-                        Personal details and information
-                    </p>
+        <div className="w-full max-w-md bg-blue-300 shadow-md rounded-lg my-auto p-4">
+            <h2 className="text-2xl font-bold mb-4">User Information</h2>
+            <div className="space-y-4">
+                <div className="flex items-center space-x-4">
+                    <div className="relative h-12 w-12 rounded-full overflow-hidden bg-gray-100">
+                        {userInfo?.avatar_url ? (
+                            <img
+                                src={userInfo.avatar_url}
+                                alt={userInfo.name}
+                                className="h-full w-full object-cover"
+                            />
+                        ) : (
+                            <div className="h-full w-full flex items-center justify-center text-xl font-bold text-gray-950">
+                                {userInfo?.name?.charAt(0)}
+                            </div>
+                        )}
+                    </div>
+                    <div>
+                        <p className="font-medium">{userInfo?.name}</p>
+                        <p className="text-sm text-gray-950">@{userInfo?.userName}</p>
+                    </div>
                 </div>
-                <div className="border-t border-gray-200">
-                    <dl>
-                        <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                            <dt className="text-sm font-medium text-gray-500">Avatar</dt>
-                            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                {user?.avatar_url ? (
-                                    <img
-                                        src={user.avatar_url}
-                                        alt="User avatar"
-                                        className="h-20 w-20 rounded-full"
-                                    />
-                                ) : (
-                                    <UserCircle className="h-20 w-20 text-gray-300" />
-                                )}
-                            </dd>
-                        </div>
-                        <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                            <dt className="text-sm font-medium text-gray-500">
-                                Full name
-                            </dt>
-                            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                {user?.name}
-                            </dd>
-                        </div>
-                        <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                            <dt className="text-sm font-medium text-gray-500">
-                                Username
-                            </dt>
-                            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                {user?.userName}
-                            </dd>
-                        </div>
-                        <div className="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                            <dt className="text-sm font-medium text-gray-500">
-                                Email address
-                            </dt>
-                            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                {user?.email}
-                            </dd>
-                        </div>
-                        <div className="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-                            <dt className="text-sm font-medium text-gray-500">User ID</dt>
-                            <dd className="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
-                                {user?.id}
-                            </dd>
-                        </div>
-                    </dl>
+                <div>
+                    <p className="text-sm font-medium">Email</p>
+                    <p className="text-sm text-gray-950">{userInfo?.email}</p>
+                </div>
+                <div>
+                    <p className="text-sm font-medium">User ID</p>
+                    <p className="text-sm text-gray-950">{userInfo?.id}</p>
                 </div>
             </div>
         </div>
