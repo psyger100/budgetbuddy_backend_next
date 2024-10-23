@@ -57,15 +57,15 @@ export default function SignIn() {
         }
     };
 
-    const refreshAccessToken = async (refreshToken: string) => {
-        try {
-            const response = await api.post("/refresh", { refreshToken });
-            return response.data.accessToken;
-        } catch (error) {
-            console.error("Token refresh error:", error);
-            return null;
-        }
-    };
+    // const refreshAccessToken = async (refreshToken: string) => {
+    //     try {
+    //         const response = await api.post("/refresh", { refreshToken });
+    //         return response.data.accessToken;
+    //     } catch (error) {
+    //         console.error("Token refresh error:", error);
+    //         return null;
+    //     }
+    // };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
