@@ -39,6 +39,7 @@ model Friend {
 model Group {
   id           String         @id @default(auto()) @map("_id") @db.ObjectId
   name         String
+  lastReset    DateTime?      @default(now())
   UserOnGroups UserOnGroups[] @relation("groupMember")
   Category     Category[]     @relation("groupCategory")
   Transaction  Transaction[]  @relation("groupTransaction")

@@ -1,15 +1,24 @@
-import { transactionTable } from "@/utils/prisma";
+import { groupTable, transactionTable } from "@/utils/prisma";
 import { NextRequest } from "next/server";
 
 export async function GET(req: NextRequest, { params }: { params: { groupId: string } }) {
     try {
         const { groupId } = params;
+
         if (groupId) {
+            const groupInfo = await groupTable.findUnique({
+                where: {
+                    id: groupId,
+                },
+            });
+            console.log(groupInfo);
+
             const data = await transactionTable.findMany({
                 where: {
                     groupId: groupId,
                     date: {
-                        gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
+                        gte: groupInfo?.lastReset ?? undefined,
+                        // gte: new Date(new Date().getFullYear(), new Date().getMonth(), 1),
                     },
                 },
                 orderBy: {
