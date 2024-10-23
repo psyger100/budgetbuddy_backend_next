@@ -11,7 +11,6 @@ export async function GET(req: NextRequest, { params }: { params: { groupId: str
                     id: groupId,
                 },
             });
-            console.log(groupInfo);
 
             const data = await transactionTable.findMany({
                 where: {
