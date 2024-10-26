@@ -1,10 +1,10 @@
 import { categoryTable, groupTable, userOnGroupsTable } from "@/utils/prisma";
 
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(req: NextRequest, { params }: { params: { groupId: string } }) {
+export async function POST(req: Request) {
     try {
-        const { groupId } = params;
+        const { groupId } = await req.json();
 
         if (groupId) {
             const records = await categoryTable.findMany({
@@ -47,10 +47,12 @@ export async function GET(req: NextRequest, { params }: { params: { groupId: str
 
             return NextResponse.json({ error: "All data reset" }, { status: 200 });
         } else {
+            console.log("naah bro ");
+
             return NextResponse.json({ error: "GroupId not found" }, { status: 404 });
         }
     } catch (error: any) {
-        console.log("throwing error");
+        console.log(error.message);
 
         return NextResponse.json({ error: error.message }, { status: 500 });
     }
