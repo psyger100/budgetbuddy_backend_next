@@ -21,7 +21,7 @@ export async function POST(request: Request) {
         delete (user as { refreshToken?: string })?.refreshToken;
         const accessToken = await generateAccessToken(user);
         const refreshToken = await generateRefreshToken(user);
-        await userTable.update({
+        const user_data = await userTable.update({
             where: {
                 id: user.id,
             },
@@ -31,6 +31,13 @@ export async function POST(request: Request) {
         });
 
         return Response.json({
+            userInformation: {
+                id: user_data?.id,
+                userName: user_data?.userName,
+                name: user_data?.name,
+                email: user_data?.email,
+                avatar_url: user_data?.avatar_url,
+            },
             setAccessToken: accessToken,
             setRefreshToken: refreshToken,
         });
