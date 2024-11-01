@@ -95,5 +95,6 @@ export const config = {
         "/api/createGroup",
         "/api/addFriend",
         "/api/whoAmI",
+        // "/api/setAvatar",
     ],
 };
