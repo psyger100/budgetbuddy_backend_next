@@ -96,5 +96,6 @@ export const config = {
         "/api/addFriend",
         "/api/whoAmI",
         // "/api/setAvatar",
+        "/api/changePassword",
     ],
 };
