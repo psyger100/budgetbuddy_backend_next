@@ -15,6 +15,7 @@ export async function GET(request: Request) {
                         name: true,
                         email: true,
                         id: true,
+                        avatar_url: true || "",
                     },
                 },
             },
