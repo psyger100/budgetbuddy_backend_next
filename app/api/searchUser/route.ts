@@ -1,6 +1,4 @@
 import { userTable } from "@/utils/prisma";
-import { stat } from "fs";
-import { NextApiRequest, NextApiResponse } from "next";
 
 export async function POST(request: Request) {
     try {
@@ -20,6 +18,7 @@ export async function POST(request: Request) {
                 email: true,
                 userName: true,
                 avatar_url: true,
+                name: true,
             },
         });
 
