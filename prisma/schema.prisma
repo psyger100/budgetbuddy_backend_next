@@ -14,17 +14,19 @@ datasource db {
 }
 
 model User {
-  id           String         @id @default(auto()) @map("_id") @db.ObjectId
+  id           String               @id @default(auto()) @map("_id") @db.ObjectId
   name         String
-  userName     String         @unique
-  email        String         @unique
+  userName     String               @unique
+  email        String               @unique
   password     String
   refreshToken String?
   avatar_url   String?
-  Transaction  Transaction[]  @relation("transactionOwner")
-  UserOnGroups UserOnGroups[] @relation("member")
-  Friend1      Friend[]       @relation("FriendRequestSender")
-  Friend2      Friend[]       @relation("FriendRequestReceiver")
+  Transaction  Transaction[]        @relation("transactionOwner")
+  UserOnGroups UserOnGroups[]       @relation("member")
+  Friend1      Friend[]             @relation("FriendRequestSender")
+  Friend2      Friend[]             @relation("FriendRequestReceiver")
+  Tsender      TransactionEntries[] @relation("transactionPayer")
+  Treceiver    TransactionEntries[] @relation("transactionReceiver")
 }
 
 model Friend {
@@ -66,14 +68,27 @@ model Category {
 }
 
 model Transaction {
-  id               String    @id @default(auto()) @map("_id") @db.ObjectId
-  description      String
-  amount           Int
-  date             DateTime? @default(now())
-  transactionOwner String    @db.ObjectId
-  user             User      @relation("transactionOwner", fields: [transactionOwner], references: [id])
-  category         Category  @relation("categoryRef", fields: [categoryId], references: [id])
-  categoryId       String    @db.ObjectId
-  groupId          String    @db.ObjectId
-  group            Group     @relation("groupTransaction", fields: [groupId], references: [id])
+  id                 String               @id @default(auto()) @map("_id") @db.ObjectId
+  description        String
+  amount             Int
+  date               DateTime            @default(now())
+  transactionOwner   String               @db.ObjectId
+  user               User                 @relation("transactionOwner", fields: [transactionOwner], references: [id])
+  category           Category             @relation("categoryRef", fields: [categoryId], references: [id])
+  categoryId         String               @db.ObjectId
+  groupId            String               @db.ObjectId
+  splited            Boolean              @default(false)
+  group              Group                @relation("groupTransaction", fields: [groupId], references: [id])
+  TransactionEntries TransactionEntries[] @relation("transactionId")
+}
+
+model TransactionEntries {
+  id            String      @id @default(auto()) @map("_id") @db.ObjectId
+  transactionId String      @db.ObjectId
+  Transaction   Transaction @relation("transactionId",fields: [transactionId], references: [id])
+  Payer         String      @db.ObjectId
+  user1         User        @relation("transactionPayer", fields: [Payer], references: [id])
+  Receiver      String      @db.ObjectId
+  user2         User        @relation("transactionReceiver", fields: [Receiver], references: [id])
+  amount        Int
 }

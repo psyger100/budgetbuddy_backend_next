@@ -1,6 +1,7 @@
 import { NextRequest } from "next/server";
 import {
     categoryTable,
+    TransactionEntriesTable,
     transactionTable,
     userOnGroupsTable,
 } from "../../../utils/prisma";
@@ -13,6 +14,12 @@ export async function POST(request: NextRequest) {
         transactionOwner: string;
         categoryId: string;
         groupId: string;
+        splitted?: boolean;
+        TransactionEntries?: {
+            Payer: string;
+            Receiver: string;
+            amount: number;
+        }[];
     } = data.addTransaction;
     addTransaction.amount = +addTransaction.amount;
     try {
@@ -27,7 +34,6 @@ export async function POST(request: NextRequest) {
             },
         });
     } catch (error: any) {
-        console.log(error.message);
         return Response.json({ message: "Failed to add transaction" }, { status: 500 });
     }
     try {
@@ -50,7 +56,6 @@ export async function POST(request: NextRequest) {
             });
         }
     } catch (error: any) {
-        console.log(error.message);
         await categoryTable.update({
             where: {
                 id: addTransaction.categoryId,
@@ -61,14 +66,74 @@ export async function POST(request: NextRequest) {
                 },
             },
         });
-        console.log(error.message);
 
         return Response.json({ message: "Failed to add transaction" }, { status: 500 });
     }
     try {
-        await transactionTable.create({
-            data: addTransaction,
-        });
+        if (!addTransaction.splitted) {
+            await transactionTable.create({
+                data: {
+                    description: addTransaction.description,
+                    amount: addTransaction.amount,
+                    splited: addTransaction.splitted,
+                    categoryId: addTransaction.categoryId,
+                    groupId: addTransaction.groupId,
+                    transactionOwner: addTransaction.transactionOwner,
+                },
+            });
+        } else {
+            const transactionTableData: {
+                id: string;
+                description: string;
+                amount: number;
+                splited: boolean;
+                categoryId: string;
+                groupId: string;
+                transactionOwner: string;
+            } = await transactionTable.create({
+                data: {
+                    description: addTransaction.description,
+                    amount: addTransaction.amount,
+                    splited: addTransaction.splitted,
+                    categoryId: addTransaction.categoryId,
+                    groupId: addTransaction.groupId,
+                    transactionOwner: addTransaction.transactionOwner,
+                },
+            });
+
+            try {
+                addTransaction.TransactionEntries?.forEach(
+                    async (elem: { Payer: string; Receiver: string; amount: number }) => {
+                        const transactionTableEntries: {
+                            id: string;
+                            transactionId: string;
+                            Payer: string;
+                            Receiver: string;
+                            amount: number;
+                        } = await TransactionEntriesTable.create({
+                            data: {
+                                transactionId: transactionTableData.id,
+                                Payer: elem.Payer,
+                                Receiver: elem.Receiver,
+                                amount: elem.amount,
+                            },
+                        });
+                    },
+                );
+                return Response.json({ message: "Transaction added" }, { status: 200 });
+            } catch (error) {
+                if (transactionTableData) {
+                    await transactionTable.delete({
+                        where: {
+                            id: transactionTableData.id,
+                        },
+                    });
+                }
+                if (error instanceof Error) {
+                    return Response.json({ message: error.message }, { status: 500 });
+                }
+            }
+        }
     } catch (error: any) {
         const userInGroupId = await userOnGroupsTable.findFirst({
             where: {
@@ -88,7 +153,7 @@ export async function POST(request: NextRequest) {
                 },
             });
         }
-        console.log(error.message);
+
         return Response.json({ message: "Failed to add transaction" }, { status: 500 });
     }
 

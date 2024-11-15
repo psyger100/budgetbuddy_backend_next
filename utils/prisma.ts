@@ -9,3 +9,4 @@ export const userTable = prisma.user;
 export const userOnGroupsTable = prisma.userOnGroups;
 export const friendTable = prisma.friend;
 export const groupTable = prisma.group;
+export const TransactionEntriesTable = prisma.transactionEntries;

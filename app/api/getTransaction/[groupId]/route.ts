@@ -1,6 +1,27 @@
 import { groupTable, transactionTable } from "@/utils/prisma";
 import { NextRequest } from "next/server";
 
+interface User {
+    id: string;
+    name: string;
+}
+
+interface Category {
+    id: string;
+    name: string;
+    maxAmount: number;
+    restAmount: number;
+}
+
+interface Transaction {
+    id: string;
+    description: string;
+    amount: number;
+    date: Date | null;
+    category: Category;
+    user: User;
+}
+
 export async function GET(req: NextRequest, { params }: { params: { groupId: string } }) {
     try {
         const { groupId } = params;
@@ -12,7 +33,7 @@ export async function GET(req: NextRequest, { params }: { params: { groupId: str
                 },
             });
 
-            const data = await transactionTable.findMany({
+            const data: Transaction[] = await transactionTable.findMany({
                 where: {
                     groupId: groupId,
                     date: {
