@@ -70,12 +70,15 @@ export async function POST(request: NextRequest) {
         return Response.json({ message: "Failed to add transaction" }, { status: 500 });
     }
     try {
+        console.log(addTransaction);
+        console.log(addTransaction.splitted);
+
         if (!addTransaction.splitted) {
             await transactionTable.create({
                 data: {
                     description: addTransaction.description,
                     amount: addTransaction.amount,
-                    splited: addTransaction.splitted,
+                    splitted: addTransaction.splitted,
                     categoryId: addTransaction.categoryId,
                     groupId: addTransaction.groupId,
                     transactionOwner: addTransaction.transactionOwner,
@@ -86,7 +89,7 @@ export async function POST(request: NextRequest) {
                 id: string;
                 description: string;
                 amount: number;
-                splited: boolean;
+                splitted: boolean;
                 categoryId: string;
                 groupId: string;
                 transactionOwner: string;
@@ -94,7 +97,7 @@ export async function POST(request: NextRequest) {
                 data: {
                     description: addTransaction.description,
                     amount: addTransaction.amount,
-                    splited: addTransaction.splitted,
+                    splitted: addTransaction.splitted,
                     categoryId: addTransaction.categoryId,
                     groupId: addTransaction.groupId,
                     transactionOwner: addTransaction.transactionOwner,
@@ -104,20 +107,31 @@ export async function POST(request: NextRequest) {
             try {
                 addTransaction.TransactionEntries?.forEach(
                     async (elem: { Payer: string; Receiver: string; amount: number }) => {
-                        const transactionTableEntries: {
-                            id: string;
-                            transactionId: string;
-                            Payer: string;
-                            Receiver: string;
-                            amount: number;
-                        } = await TransactionEntriesTable.create({
-                            data: {
-                                transactionId: transactionTableData.id,
-                                Payer: elem.Payer,
-                                Receiver: elem.Receiver,
-                                amount: elem.amount,
-                            },
-                        });
+                        try {
+                            const transactionTableEntries: {
+                                id: string;
+                                transactionId: string;
+                                Payer: string;
+                                Receiver: string;
+                                amount: number;
+                            } = await TransactionEntriesTable.create({
+                                data: {
+                                    transactionId: transactionTableData.id,
+                                    Payer: elem.Payer,
+                                    Receiver: elem.Receiver,
+                                    amount: elem.amount,
+                                    groupId: transactionTableData.groupId,
+                                },
+                            });
+                            console.log(
+                                "this is transactionEntriesTable Entries ",
+                                transactionTableEntries,
+                            );
+                        } catch (error) {
+                            if (error instanceof Error) {
+                                console.log(error.message);
+                            }
+                        }
                     },
                 );
                 return Response.json({ message: "Transaction added" }, { status: 200 });

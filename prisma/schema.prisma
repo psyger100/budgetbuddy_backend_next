@@ -45,6 +45,8 @@ model Group {
   UserOnGroups UserOnGroups[] @relation("groupMember")
   Category     Category[]     @relation("groupCategory")
   Transaction  Transaction[]  @relation("groupTransaction")
+
+  TransactionEntries TransactionEntries[] @relation("groupSplitedTransaction")
 }
 
 model UserOnGroups {
@@ -71,13 +73,13 @@ model Transaction {
   id                 String               @id @default(auto()) @map("_id") @db.ObjectId
   description        String
   amount             Int
-  date               DateTime            @default(now())
+  date               DateTime             @default(now())
   transactionOwner   String               @db.ObjectId
   user               User                 @relation("transactionOwner", fields: [transactionOwner], references: [id])
   category           Category             @relation("categoryRef", fields: [categoryId], references: [id])
   categoryId         String               @db.ObjectId
   groupId            String               @db.ObjectId
-  splited            Boolean              @default(false)
+  splitted           Boolean              @default(false)
   group              Group                @relation("groupTransaction", fields: [groupId], references: [id])
   TransactionEntries TransactionEntries[] @relation("transactionId")
 }
@@ -85,10 +87,12 @@ model Transaction {
 model TransactionEntries {
   id            String      @id @default(auto()) @map("_id") @db.ObjectId
   transactionId String      @db.ObjectId
-  Transaction   Transaction @relation("transactionId",fields: [transactionId], references: [id])
+  Transaction   Transaction @relation("transactionId", fields: [transactionId], references: [id])
   Payer         String      @db.ObjectId
   user1         User        @relation("transactionPayer", fields: [Payer], references: [id])
   Receiver      String      @db.ObjectId
   user2         User        @relation("transactionReceiver", fields: [Receiver], references: [id])
+  groupId       String      @db.ObjectId
+  group         Group       @relation("groupSplitedTransaction", fields: [groupId], references: [id])
   amount        Int
 }
